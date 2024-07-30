@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
-import 'dart:io'; // Import the dart:io library for File
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EditPage extends StatefulWidget {
   final String name;
-  final int numberOfDonations;
   final String phoneNumber;
-  final String email;
+  final String location;
   final String dob;
-  final String address;
-  final String avatarUrl;
+  final double age;
+  final double weight;
+  final String bloodGroup;
 
-  const EditPage({super.key,
+  const EditPage({
+    super.key,
     required this.name,
-    required this.numberOfDonations,
     required this.phoneNumber,
-    required this.email,
+    required this.location,
     required this.dob,
-    required this.address,
-    required this.avatarUrl,
+    required this.age,
+    required this.weight,
+    required this.bloodGroup,
   });
 
   @override
@@ -25,36 +27,71 @@ class EditPage extends StatefulWidget {
 }
 
 class _EditPageState extends State<EditPage> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _donationsController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _dobController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
-  File? _avatarFile; // Declare _avatarFile as nullable File
+  final _formKey = GlobalKey<FormState>();
+
+  late TextEditingController _nameController;
+  late TextEditingController _phoneController;
+  late TextEditingController _locationController;
+  late TextEditingController _dobController;
+
+  late double age;
+  late double weight;
+  late String bloodGroup;
 
   @override
   void initState() {
     super.initState();
-    _nameController.text = widget.name;
-    _donationsController.text = widget.numberOfDonations.toString();
-    _phoneController.text = widget.phoneNumber;
-    _emailController.text = widget.email;
-    _dobController.text = widget.dob;
-    _addressController.text = widget.address;
-    // Set _avatarFile to null initially to show default profile image
-    _avatarFile = null;
+    _nameController = TextEditingController(text: widget.name);
+    _phoneController = TextEditingController(text: widget.phoneNumber);
+    _locationController = TextEditingController(text: widget.location);
+    _dobController = TextEditingController(text: widget.dob);
+
+    age = widget.age;
+    weight = widget.weight;
+    bloodGroup = widget.bloodGroup;
   }
 
   @override
   void dispose() {
     _nameController.dispose();
-    _donationsController.dispose();
     _phoneController.dispose();
-    _emailController.dispose();
+    _locationController.dispose();
     _dobController.dispose();
-    _addressController.dispose();
     super.dispose();
+  }
+
+  void _updateProfile() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      try {
+        await FirebaseFirestore.instance.collection('profile').doc(user.uid).update({
+          'name': _nameController.text,
+          'phone_number': _phoneController.text,
+          'location': _locationController.text,
+          'date_of_birth': _dobController.text,
+          'age': age,
+          'weight': weight,
+          'blood_group': bloodGroup,
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profile updated successfully')),
+        );
+        Navigator.pop(context, {
+          'name': _nameController.text,
+          'phoneNumber': _phoneController.text,
+          'location': _locationController.text,
+          'dob': _dobController.text,
+          'age': age,
+          'weight': weight,
+          'bloodGroup': bloodGroup,
+        }); // Pop the edit page after successful update and pass updated data back
+      } catch (e) {
+        print('Error updating profile: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to update profile')),
+        );
+      }
+    }
   }
 
   @override
@@ -62,75 +99,86 @@ class _EditPageState extends State<EditPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Profile'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.save),
-            onPressed: () {
-              // Pass edited data back to MyProfile page
-              Navigator.pop(context, {
-                'name': _nameController.text,
-                'numberOfDonations': int.tryParse(_donationsController.text) ?? 0,
-                'phoneNumber': _phoneController.text,
-                'email': _emailController.text,
-                'dob': _dobController.text,
-                'address': _addressController.text,
-                'avatarFile': _avatarFile,
-              });
-            },
-          ),
-        ],
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: [
-            Center(
-              child: GestureDetector(
-                onTap: () {
-                  // Handle picking image here
-                  // Placeholder for future implementation
-                },
-                child: CircleAvatar(
-                  radius: 50,
-                  backgroundImage: _avatarFile != null
-                      ? FileImage(_avatarFile!)
-                      : NetworkImage(widget.avatarUrl) as ImageProvider,
-                  // Use default image if _avatarFile is null
-                  // Replace NetworkImage with AssetImage or any other default image asset
-                  // if _avatarFile is null
-                ),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(labelText: 'Name'),
               ),
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Name'),
-            ),
-            TextFormField(
-              controller: _donationsController,
-              decoration: const InputDecoration(labelText: 'Number of Donations'),
-              keyboardType: TextInputType.number,
-            ),
-            TextFormField(
-              controller: _phoneController,
-              decoration: const InputDecoration(labelText: 'Phone Number'),
-              keyboardType: TextInputType.phone,
-            ),
-            TextFormField(
-              controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
-              keyboardType: TextInputType.emailAddress,
-            ),
-            TextFormField(
-              controller: _dobController,
-              decoration: const InputDecoration(labelText: 'Date of Birth'),
-              keyboardType: TextInputType.datetime,
-            ),
-            TextFormField(
-              controller: _addressController,
-              decoration: const InputDecoration(labelText: 'Address'),
-            ),
-          ],
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _phoneController,
+                decoration: const InputDecoration(labelText: 'Phone Number'),
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _locationController,
+                decoration: const InputDecoration(labelText: 'Location'),
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _dobController,
+                decoration: const InputDecoration(labelText: 'Date of Birth'),
+              ),
+              const SizedBox(height: 16),
+              const Text('Age'),
+              Slider(
+                value: age,
+                min: 0,
+                max: 100,
+                divisions: 100,
+                label: age.round().toString(),
+                onChanged: (value) {
+                  setState(() {
+                    age = value;
+                  });
+                },
+              ),
+              Text('Selected Age: ${age.round()}'),
+              const SizedBox(height: 16),
+              const Text('Weight'),
+              Slider(
+                value: weight,
+                min: 0,
+                max: 200,
+                divisions: 200,
+                label: weight.round().toString(),
+                onChanged: (value) {
+                  setState(() {
+                    weight = value;
+                  });
+                },
+              ),
+              Text('Selected Weight: ${weight.round()} kg'),
+              const SizedBox(height: 16),
+              const Text('Blood Group'),
+              Wrap(
+                spacing: 8.0,
+                children: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
+                    .map((group) => ChoiceChip(
+                  label: Text(group),
+                  selected: bloodGroup == group,
+                  onSelected: (selected) {
+                    setState(() {
+                      bloodGroup = group;
+                    });
+                  },
+                ))
+                    .toList(),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _updateProfile,
+                child: const Text('Save'),
+              ),
+            ],
+          ),
         ),
       ),
     );

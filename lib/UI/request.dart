@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'profile.dart';
 import 'donation.dart';
 import 'home.dart';
-
+import 'blood_bank_display.dart';
 
 class BloodRequestForm extends StatefulWidget {
   const BloodRequestForm({super.key});
@@ -15,23 +16,18 @@ class _BloodRequestFormState extends State<BloodRequestForm> {
   final _formKey = GlobalKey<FormState>();
 
   String _patientName = '';
-  String _dateOfBirth = '';
-  String _gender = '';
+  String _age = '';
+  String _gender = 'Male';
   String _patientID = '';
-  String _bloodGroup = '';
+  String _bloodGroup = 'A+';
   String _physicianName = '';
   String _department = '';
   String _physicianContact = '';
-  String _hospitalName = '';
-  String _hospitalAddress = '';
-  String _hospitalContact = '';
+  String _hospitalDetails = '';
   final List<String> _bloodComponents = [];
   int _quantity = 1;
-  String _dateTimeNeeded = '';
   String _diagnosis = '';
-  String _surgeryDetails = '';
-  String _previousTransfusions = '';
-  String _specialRequirements = '';
+  String _additionalDetails = '';
   bool _consent = false;
   String _comments = '';
 
@@ -71,7 +67,6 @@ class _BloodRequestFormState extends State<BloodRequestForm> {
                 );
               },
             ),
-
             ListTile(
               leading: const Icon(Icons.bloodtype),
               title: const Text('Blood Donation'),
@@ -82,7 +77,6 @@ class _BloodRequestFormState extends State<BloodRequestForm> {
                 ); // Navigate to donation.dart
               },
             ),
-
             ListTile(
               leading: const Icon(Icons.request_page), // Icon for Blood Request
               title: const Text('Blood Request'), // Text for Blood Request
@@ -141,27 +135,70 @@ class _BloodRequestFormState extends State<BloodRequestForm> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _buildTextField('Full Name', Icons.person, (value) => _patientName = value),
+                    _buildTextField('Full Name', Icons.person, (value) => _patientName = value, validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter the Full Name';
+                      }
+                      if (!RegExp(r"^[a-zA-Z\s]+$").hasMatch(value)) {
+                        return 'Name must contain only letters';
+                      }
+                      return null;
+                    }),
                     const SizedBox(height: 16),
-                    _buildDateTextField('Date of Birth', Icons.calendar_today, (value) => _dateOfBirth = value),
+                    _buildTextField('Age', Icons.calendar_today, (value) => _age = value, keyboardType: TextInputType.number, validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter the Age';
+                      }
+                      if (!RegExp(r"^\d+$").hasMatch(value) || int.parse(value) <= 0) {
+                        return 'Age must be a positive number';
+                      }
+                      return null;
+                    }),
                     const SizedBox(height: 16),
-                    _buildTextField('Gender', Icons.wc, (value) => _gender = value),
+                    _buildDropdown('Gender', Icons.wc, ['Male', 'Female', 'Other'], _gender, (value) => setState(() => _gender = value!)),
                     const SizedBox(height: 16),
-                    _buildTextField('Patient ID', Icons.format_list_numbered, (value) => _patientID = value),
+                    _buildTextField('Patient ID', Icons.format_list_numbered, (value) => _patientID = value, validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter the Patient ID';
+                      }
+                      return null;
+                    }),
                     const SizedBox(height: 16),
-                    _buildTextField('Blood Group', Icons.opacity, (value) => _bloodGroup = value),
+                    _buildDropdown('Blood Group', Icons.opacity, ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], _bloodGroup, (value) => setState(() => _bloodGroup = value!)),
                     const SizedBox(height: 16),
-                    _buildTextField('Physician Name', Icons.person_outline, (value) => _physicianName = value),
+                    _buildTextField('Physician Name', Icons.person_outline, (value) => _physicianName = value, validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter the Physician Name';
+                      }
+                      if (!RegExp(r"^[a-zA-Z\s]+$").hasMatch(value)) {
+                        return 'Name must contain only letters';
+                      }
+                      return null;
+                    }),
                     const SizedBox(height: 16),
-                    _buildTextField('Department', Icons.work, (value) => _department = value),
+                    _buildTextField('Department', Icons.work, (value) => _department = value, validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter the Department';
+                      }
+                      return null;
+                    }),
                     const SizedBox(height: 16),
-                    _buildTextField('Contact Information', Icons.contact_phone, (value) => _physicianContact = value),
+                    _buildTextField('Physician Contact', Icons.contact_phone, (value) => _physicianContact = value, keyboardType: TextInputType.phone, validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter the Physician Contact';
+                      }
+                      if (!RegExp(r"^\d{10}$").hasMatch(value)) {
+                        return 'Contact must be a 10-digit number';
+                      }
+                      return null;
+                    }),
                     const SizedBox(height: 16),
-                    _buildTextField('Hospital/Clinic Name', Icons.local_hospital, (value) => _hospitalName = value),
-                    const SizedBox(height: 16),
-                    _buildTextField('Address', Icons.location_on, (value) => _hospitalAddress = value),
-                    const SizedBox(height: 16),
-                    _buildTextField('Contact Information', Icons.phone, (value) => _hospitalContact = value),
+                    _buildTextField('Hospital/Clinic Details', Icons.local_hospital, (value) => _hospitalDetails = value, validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter the Hospital/Clinic Details';
+                      }
+                      return null;
+                    }),
                     const SizedBox(height: 16),
                     _buildCheckboxList('Type of Blood Component', [
                       'Whole Blood',
@@ -171,92 +208,75 @@ class _BloodRequestFormState extends State<BloodRequestForm> {
                       'Cryoprecipitate'
                     ]),
                     const SizedBox(height: 16),
-                    _buildTextField('Quantity', Icons.format_list_numbered, (value) => _quantity = int.tryParse(value) ?? 1),
+                    _buildTextField('Quantity', Icons.format_list_numbered, (value) => _quantity = int.tryParse(value) ?? 1, keyboardType: TextInputType.number, validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter the Quantity';
+                      }
+                      if (!RegExp(r"^\d+$").hasMatch(value) || int.parse(value) <= 0) {
+                        return 'Quantity must be a positive number';
+                      }
+                      return null;
+                    }),
                     const SizedBox(height: 16),
-                    _buildCheckboxList('Urgency', [
-                      'Emergency',
-                      'Scheduled/Planned',
-                      'Routine',
-                    ]),
+                    _buildTextField('Diagnosis', Icons.local_hospital, (value) => _diagnosis = value, validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter the Diagnosis';
+                      }
+                      return null;
+                    }),
                     const SizedBox(height: 16),
-                    _buildDateTextField('Date and Time Needed', Icons.calendar_today, (value) => _dateTimeNeeded = value),
-                    const SizedBox(height: 16),
-                    _buildTextField('Diagnosis', Icons.local_hospital, (value) => _diagnosis = value),
-                    const SizedBox(height: 16),
-                    _buildTextField('Surgery Details (if applicable)', Icons.local_hospital, (value) => _surgeryDetails = value),
-                    const SizedBox(height: 16),
-                    _buildCheckboxWithText('Previous Transfusions', 'If Yes, Details', (value) => _previousTransfusions = value),
-                    const SizedBox(height: 16),
-                    _buildCheckboxWithText('Special Requirements', 'If Yes, Details', (value) => _specialRequirements = value),
+                    _buildTextField('Additional Details (e.g., Surgery, Transfusions, Special Requirements)', Icons.local_hospital, (value) => _additionalDetails = value),
                     const SizedBox(height: 16),
                     _buildConsentCheckbox(),
                     const SizedBox(height: 16),
                     _buildTextField('Comments', Icons.comment, (value) => _comments = value),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 32), // Adjust the bottom padding to make space for the submit button
+                    _buildSubmitButton(), // Add the submit button within the scrollable area
                   ],
                 ),
               ),
             ),
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: _buildSubmitButton(),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildTextField(String label, IconData icon, ValueChanged<String> onChanged) {
+  Widget _buildTextField(String labelText, IconData icon, Function(String) onChanged, {TextInputType keyboardType = TextInputType.text, FormFieldValidator<String>? validator}) {
     return TextFormField(
       decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(color: Colors.red.shade900),
-        prefixIcon: Icon(icon, color: Colors.red.shade900),
+        labelText: labelText,
+        prefixIcon: Icon(icon),
         border: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.red.shade900),
+          borderSide: BorderSide(color: Colors.grey), // Grey underline
         ),
       ),
+      keyboardType: keyboardType,
       onChanged: onChanged,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter the $label';
-        }
-        return null;
-      },
+      validator: validator,
     );
   }
 
-  Widget _buildDateTextField(String label, IconData icon, ValueChanged<String> onChanged) {
-    final TextEditingController controller = TextEditingController();
-    return TextFormField(
-      controller: controller,
-      readOnly: true,
+  Widget _buildDropdown(String labelText, IconData icon, List<String> items, String value, ValueChanged<String?> onChanged) {
+    return InputDecorator(
       decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(color: Colors.red.shade900),
-        prefixIcon: Icon(icon, color: Colors.red.shade900),
+        labelText: labelText,
+        prefixIcon: Icon(icon),
         border: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.red.shade900),
+          borderSide: BorderSide(color: Colors.grey), // Grey underline
         ),
-        suffixIcon: IconButton(
-          icon: Icon(Icons.calendar_today, color: Colors.red.shade900),
-          onPressed: () async {
-            final DateTime? pickedDate = await showDatePicker(
-              context: context,
-              initialDate: DateTime.now(),
-              firstDate: DateTime(1900),
-              lastDate: DateTime.now(),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: value,
+          isDense: true,
+          onChanged: onChanged,
+          items: items.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
             );
-            if (pickedDate != null) {
-              setState(() {
-                controller.text = "${pickedDate.toLocal()}".split(' ')[0];
-                onChanged(controller.text);
-              });
-            }
-          },
+          }).toList(),
         ),
       ),
     );
@@ -268,18 +288,14 @@ class _BloodRequestFormState extends State<BloodRequestForm> {
       children: [
         Text(
           title,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.red.shade900,
-          ),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         ...options.map((option) => CheckboxListTile(
-          title: Text(option, style: TextStyle(color: Colors.red.shade900)),
+          title: Text(option),
           value: _bloodComponents.contains(option),
-          onChanged: (checked) {
+          onChanged: (bool? value) {
             setState(() {
-              if (checked!) {
+              if (value == true) {
                 _bloodComponents.add(option);
               } else {
                 _bloodComponents.remove(option);
@@ -291,87 +307,72 @@ class _BloodRequestFormState extends State<BloodRequestForm> {
     );
   }
 
-  Widget _buildCheckboxWithText(String title, String textFieldLabel, ValueChanged<String> onChanged) {
-    final TextEditingController controller = TextEditingController();
-    bool isChecked = false;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.red.shade900,
-              ),
-            ),
-            Checkbox(
-              value: isChecked,
-              onChanged: (checked) {
-                setState(() {
-                  isChecked = checked ?? false;
-                  if (!isChecked) {
-                    controller.clear();
-                  }
-                });
-              },
-            ),
-          ],
-        ),
-        if (isChecked)
-          TextFormField(
-            controller: controller,
-            decoration: InputDecoration(
-              labelText: textFieldLabel,
-              labelStyle: TextStyle(color: Colors.red.shade900),
-              border: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.red.shade900),
-              ),
-            ),
-            onChanged: onChanged,
-          ),
-      ],
-    );
-  }
-
   Widget _buildConsentCheckbox() {
     return CheckboxListTile(
-      title: Text(
-        'I hereby give my consent for the transfusion of blood products as prescribed',
-        style: TextStyle(color: Colors.red.shade900),
-      ),
+      title: const Text('I confirm that I have obtained consent from the patient or their representative to collect and transfuse blood as necessary.'),
       value: _consent,
-      onChanged: (checked) {
+      onChanged: (bool? value) {
         setState(() {
-          _consent = checked ?? false;
+          _consent = value ?? false;
         });
       },
     );
   }
 
   Widget _buildSubmitButton() {
-    return ElevatedButton(
-      onPressed: () {
-        if (_formKey.currentState!.validate()) {
-          // Process the form submission
-        }
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.red.shade900, // Background color
-        foregroundColor: Colors.white, // Text color
-        padding: EdgeInsets.zero, // Remove padding
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.zero, // Make the button rectangular
+    return Center(
+      child: SizedBox(
+        width: double.infinity, // Make the button wide
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red.shade900, // Red background color
+            foregroundColor: Colors.white, // White text color
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero, // Make the button rectangular
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 13.0), // Make the button a little longer
+          ),
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              if (!_consent) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please confirm consent to proceed')),
+                );
+                return;
+              }
+
+              _fetchBloodBankData(_bloodGroup);
+            }
+          },
+          child: const Text('Submit',style: TextStyle(fontSize: 20)),
         ),
       ),
-      child: Container(
-        height: 55,
-        alignment: Alignment.center,
-        child: const Text('SUBMIT'),
+    );
+  }
+
+  void _fetchBloodBankData(String bloodGroup) async {
+    final QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('blood_data').get();
+
+    final List<Map<String, dynamic>> bloodBanks = querySnapshot.docs.map((doc) {
+      return {
+        'name': doc.id,
+        'data': doc.data() as Map<String, dynamic>,
+      };
+    }).toList();
+
+    final List<Map<String, dynamic>> availableBloodBanks = bloodBanks.where((bloodBank) {
+      return bloodBank['data'][bloodGroup] != null && bloodBank['data'][bloodGroup] >= _quantity;
+    }).toList();
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BloodBankDisplay(
+          bloodGroup: bloodGroup,
+          quantity: _quantity,
+          availableBloodBanks: availableBloodBanks,
+        ),
       ),
     );
   }
 }
-

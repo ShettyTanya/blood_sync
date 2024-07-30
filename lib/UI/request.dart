@@ -248,7 +248,7 @@ class _BloodRequestFormState extends State<BloodRequestForm> {
         labelText: labelText,
         prefixIcon: Icon(icon),
         border: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey), // Grey underline
+          borderSide: const BorderSide(color: Colors.grey), // Grey underline
         ),
       ),
       keyboardType: keyboardType,
@@ -263,7 +263,7 @@ class _BloodRequestFormState extends State<BloodRequestForm> {
         labelText: labelText,
         prefixIcon: Icon(icon),
         border: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey), // Grey underline
+          borderSide: const BorderSide(color: Colors.grey), // Grey underline
         ),
       ),
       child: DropdownButtonHideUnderline(
@@ -327,7 +327,7 @@ class _BloodRequestFormState extends State<BloodRequestForm> {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.red.shade900, // Red background color
             foregroundColor: Colors.white, // White text color
-            shape: RoundedRectangleBorder(
+            shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.zero, // Make the button rectangular
             ),
             padding: const EdgeInsets.symmetric(vertical: 13.0), // Make the button a little longer

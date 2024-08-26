@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'home.dart';
 
 class BloodBankDisplay extends StatelessWidget {
   final String bloodGroup;
@@ -7,18 +7,18 @@ class BloodBankDisplay extends StatelessWidget {
   final List<Map<String, dynamic>> availableBloodBanks;
 
   const BloodBankDisplay({
-    Key? key,
+    super.key,
     required this.bloodGroup,
     required this.quantity,
     required this.availableBloodBanks,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.red.shade900,
-        iconTheme: IconThemeData(color: Colors.white), // Set the back button color to white
+        iconTheme: const IconThemeData(color: Colors.white), // Set the back button color to white
       ),
       body: Column(
         children: [
@@ -48,7 +48,7 @@ class BloodBankDisplay extends StatelessWidget {
                   final bloodBankName = bloodBank['name'];
                   final bloodBankData = bloodBank['data'];
                   final bloodAvailable = bloodBankData[bloodGroup];
-                  final bloodBankPhoneNumber = bloodBankData['phone_number'];
+                  final bloodBankPhoneNumber = bloodBankData['phone_number'].toString(); // Convert to String
 
                   return Card(
                     child: ListTile(
@@ -64,13 +64,53 @@ class BloodBankDisplay extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text('Available units of $bloodGroup: $bloodAvailable'),
-                          Text('Contact: $bloodBankPhoneNumber'),
+                          const SizedBox(height: 4), // Add a little spacing
+                          Row(
+                            children: [
+                              const Text('Contact: '),
+                              SelectableText(
+                                bloodBankPhoneNumber,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                                toolbarOptions: const ToolbarOptions(
+                                  copy: true,
+                                  selectAll: true,
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
                   );
                 },
               ),
+            ),
+          ),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red.shade900,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.zero,
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => HomePage()), // Navigate to BloodRequestForm page
+                  );
+                }, // Navigate back to the previous page or HomePage
+              child: const Text('Back to Home'),
             ),
           ),
         ],

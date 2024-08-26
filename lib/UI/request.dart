@@ -4,6 +4,7 @@ import 'profile.dart';
 import 'donation.dart';
 import 'home.dart';
 import 'blood_bank_display.dart';
+import 'blood_facts.dart';
 
 class BloodRequestForm extends StatefulWidget {
   const BloodRequestForm({super.key});
@@ -90,9 +91,12 @@ class _BloodRequestFormState extends State<BloodRequestForm> {
             ListTile(
               leading: const Icon(Icons.fact_check),
               title: const Text('Blood Facts'),
-              onTap: () {
-                // Navigate to Blood Facts page
-              },
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const BloodFactsPage()), // Navigate to BloodRequestForm page
+                  );
+                }
             ),
             ListTile(
               leading: const Icon(Icons.home), // Icon for Home Page
@@ -208,7 +212,7 @@ class _BloodRequestFormState extends State<BloodRequestForm> {
                       'Cryoprecipitate'
                     ]),
                     const SizedBox(height: 16),
-                    _buildTextField('Quantity', Icons.format_list_numbered, (value) => _quantity = int.tryParse(value) ?? 1, keyboardType: TextInputType.number, validator: (value) {
+                    _buildTextField('Quantity (in ml)', Icons.format_list_numbered, (value) => _quantity = int.tryParse(value) ?? 1, keyboardType: TextInputType.number, validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter the Quantity';
                       }
@@ -247,8 +251,8 @@ class _BloodRequestFormState extends State<BloodRequestForm> {
       decoration: InputDecoration(
         labelText: labelText,
         prefixIcon: Icon(icon),
-        border: UnderlineInputBorder(
-          borderSide: const BorderSide(color: Colors.grey), // Grey underline
+        border: const UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey), // Grey underline
         ),
       ),
       keyboardType: keyboardType,
@@ -262,8 +266,8 @@ class _BloodRequestFormState extends State<BloodRequestForm> {
       decoration: InputDecoration(
         labelText: labelText,
         prefixIcon: Icon(icon),
-        border: UnderlineInputBorder(
-          borderSide: const BorderSide(color: Colors.grey), // Grey underline
+        border: const UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey), // Grey underline
         ),
       ),
       child: DropdownButtonHideUnderline(

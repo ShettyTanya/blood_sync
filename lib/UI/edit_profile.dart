@@ -99,85 +99,172 @@ class _EditPageState extends State<EditPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Profile'),
+        backgroundColor: Colors.red.shade900,
       ),
-      body: SingleChildScrollView(
+      body: Container(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Name'),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _phoneController,
-                decoration: const InputDecoration(labelText: 'Phone Number'),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _locationController,
-                decoration: const InputDecoration(labelText: 'Location'),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _dobController,
-                decoration: const InputDecoration(labelText: 'Date of Birth'),
-              ),
-              const SizedBox(height: 16),
-              const Text('Age'),
-              Slider(
-                value: age,
-                min: 0,
-                max: 100,
-                divisions: 100,
-                label: age.round().toString(),
-                onChanged: (value) {
-                  setState(() {
-                    age = value;
-                  });
-                },
-              ),
-              Text('Selected Age: ${age.round()}'),
-              const SizedBox(height: 16),
-              const Text('Weight'),
-              Slider(
-                value: weight,
-                min: 0,
-                max: 200,
-                divisions: 200,
-                label: weight.round().toString(),
-                onChanged: (value) {
-                  setState(() {
-                    weight = value;
-                  });
-                },
-              ),
-              Text('Selected Weight: ${weight.round()} kg'),
-              const SizedBox(height: 16),
-              const Text('Blood Group'),
-              Wrap(
-                spacing: 8.0,
-                children: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
-                    .map((group) => ChoiceChip(
-                  label: Text(group),
-                  selected: bloodGroup == group,
-                  onSelected: (selected) {
+        color: Colors.white, // Set the background color of the body to white
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Name',
+                    labelStyle: TextStyle(color: Colors.red.shade900),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey.shade600), // Grey line
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey.shade600), // Grey line
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _phoneController,
+                  decoration: InputDecoration(
+                    labelText: 'Phone Number',
+                    labelStyle: TextStyle(color: Colors.red.shade900),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey.shade600), // Grey line
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey.shade600), // Grey line
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _locationController,
+                  decoration: InputDecoration(
+                    labelText: 'Location',
+                    labelStyle: TextStyle(color: Colors.red.shade900),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey.shade600), // Grey line
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey.shade600), // Grey line
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _dobController,
+                  decoration: InputDecoration(
+                    labelText: 'Date of Birth',
+                    labelStyle: TextStyle(color: Colors.red.shade900),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey.shade600), // Grey line
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey.shade600), // Grey line
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Age',
+                  style: TextStyle(color: Colors.black54),
+                ),
+                Slider(
+                  value: age,
+                  min: 0,
+                  max: 100,
+                  divisions: 100,
+                  label: age.round().toString(),
+                  activeColor: Colors.red.shade900,
+                  inactiveColor: Colors.red.shade100,
+                  onChanged: (value) {
                     setState(() {
-                      bloodGroup = group;
+                      age = value;
                     });
                   },
-                ))
-                    .toList(),
+                ),
+                Text(
+                  'Selected Age: ${age.round()}',
+                  style: const TextStyle(color: Colors.black54),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Weight',
+                  style: TextStyle(color: Colors.black54),
+                ),
+                Slider(
+                  value: weight,
+                  min: 0,
+                  max: 200,
+                  divisions: 200,
+                  label: weight.round().toString(),
+                  activeColor: Colors.red.shade900,
+                  inactiveColor: Colors.red.shade100,
+                  onChanged: (value) {
+                    setState(() {
+                      weight = value;
+                    });
+                  },
+                ),
+                Text(
+                  'Selected Weight: ${weight.round()} kg',
+                  style: const TextStyle(color: Colors.black54),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Blood Group',
+                  style: TextStyle(color: Colors.black54),
+                ),
+                Wrap(
+                  spacing: 8.0,
+                  children: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
+                      .map((group) => ChoiceChip(
+                    label: Text(group),
+                    labelStyle: TextStyle(
+                      color: bloodGroup == group
+                          ? Colors.white
+                          : Colors.red.shade900,
+                    ),
+                    selectedColor: Colors.red.shade900,
+                    backgroundColor: Colors.white,
+                    selected: bloodGroup == group,
+                    onSelected: (selected) {
+                      setState(() {
+                        bloodGroup = group;
+                      });
+                    },
+                  ))
+                      .toList(),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.zero,
+          color: Colors.red.shade900,
+          child: Align(
+            alignment: Alignment.center,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.zero, // No padding
+                backgroundColor: Colors.red.shade900,
+                shape: const RoundedRectangleBorder(),
+                fixedSize: Size.fromHeight(50),
               ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _updateProfile,
-                child: const Text('Save'),
+              onPressed: _updateProfile,
+              child: const Text(
+                'Save',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
               ),
-            ],
+            ),
           ),
         ),
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'donation.dart';
 import 'request.dart'; // Import the request.dart file
 import 'profile.dart'; // Import the profile.dart file where ProfilePage is defined
+import 'blood_facts.dart';
 
 class HomePage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -60,11 +61,14 @@ class HomePage extends StatelessWidget {
               },
             ),
             ListTile(
-              leading:const  Icon(Icons.fact_check),
-              title: const Text('Blood Facts'),
-              onTap: () {
-                // Navigate to Blood Facts page
-              },
+                leading:const  Icon(Icons.fact_check),
+                title: const Text('Blood Facts'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const BloodFactsPage()), // Navigate to BloodRequestForm page
+                  );
+                }
             ),
           ],
         ),
@@ -73,7 +77,7 @@ class HomePage extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           Image.asset(
-            'assets/home.png', // Ensure you have the background image in the assets directory
+            'assets/home_2.png', // Ensure you have the background image in the assets directory
             fit: BoxFit.cover,
           ),
           Column(

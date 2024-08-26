@@ -19,8 +19,6 @@ class _MyProfileState extends State<MyProfile> {
   double _weight = 0;
   String _bloodGroup = '';
 
-  final String _avatarUrl = 'https://via.placeholder.com/150';
-
   @override
   void initState() {
     super.initState();
@@ -51,22 +49,18 @@ class _MyProfileState extends State<MyProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.red.shade700,
+        backgroundColor: Colors.transparent, // Make app bar transparent
+        elevation: 0, // Remove shadow
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back, color: Colors.black), // Change back icon color
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: const Center(
-          child: Text(
-            'My Profile',
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
+
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit),
+            icon: const Icon(Icons.edit, color: Colors.black), // Change edit icon color
             onPressed: () async {
               // Navigate to the EditPage and wait for result
               final Map<String, dynamic>? result = await Navigator.push(
@@ -100,64 +94,81 @@ class _MyProfileState extends State<MyProfile> {
           ),
         ],
       ),
-      body: Stack(
+      body: Column(
         children: [
           Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/intro.png'),
-                fit: BoxFit.cover,
+            width: double.infinity, // Make the container wide
+            color: Colors.red.shade900, // Red box color
+            padding: const EdgeInsets.symmetric(vertical: 8.0), // Adjust vertical padding
+            child: const Center(
+              child: Text(
+                'Profile',
+                style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
+          Expanded(
+            child: Stack(
               children: [
-                Center(
-                  child: CircleAvatar(
-                    radius: 50,
-                    backgroundImage: NetworkImage(_avatarUrl),
-                  ),
-                ),
-                const SizedBox(height: 16),
                 Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Center(
-                    child: Text(
-                      _name.isNotEmpty ? _name : 'Loading...',
-                      style: const TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/intro.png'),
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.8),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0), // Reduce outer padding
                   child: Column(
                     children: [
-                      _buildInfoRow(Icons.phone, _phoneNumber.isNotEmpty ? _phoneNumber : 'Loading...'),
-                      const SizedBox(height: 16),
-                      _buildInfoRow(Icons.location_on, _location.isNotEmpty ? _location : 'Loading...'),
-                      const SizedBox(height: 16),
-                      _buildInfoRow(Icons.calendar_today, _dob.isNotEmpty ? _dob : 'Loading...'),
-                      const SizedBox(height: 16),
-                      _buildInfoRow(Icons.cake, 'Age: ${_age > 0 ? _age.toString() : 'Loading...'}'),
-                      const SizedBox(height: 16),
-                      _buildInfoRow(Icons.monitor_weight, 'Weight: ${_weight > 0 ? _weight.toString() : 'Loading...'} kg'),
-                      const SizedBox(height: 16),
-                      _buildInfoRow(Icons.bloodtype, 'Blood Group: ${_bloodGroup.isNotEmpty ? _bloodGroup : 'Loading...'}'),
+                      Center(
+                        child: CircleAvatar(
+                          radius: 40, // Reduce avatar size
+                          backgroundImage: const AssetImage('assets/profile_icon.png'),
+                        ),
+                      ),
+                      const SizedBox(height: 8), // Reduce space between avatar and name
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 6), // Reduce padding
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Center(
+                          child: Text(
+                            _name.isNotEmpty ? _name : 'Loading...',
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8), // Reduce space between name and info box
+                      Container(
+                        padding: const EdgeInsets.all(12.0), // Reduce inner padding
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.8),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Column(
+                          children: [
+                            _buildInfoRow(Icons.phone, _phoneNumber.isNotEmpty ? _phoneNumber : 'Loading...'),
+                            const SizedBox(height: 8),
+                            _buildInfoRow(Icons.location_on, _location.isNotEmpty ? _location : 'Loading...'),
+                            const SizedBox(height: 8),
+                            _buildInfoRow(Icons.calendar_today, _dob.isNotEmpty ? _dob : 'Loading...'),
+                            const SizedBox(height: 8),
+                            _buildInfoRow(Icons.cake, 'Age: ${_age > 0 ? _age.toString() : 'Loading...'}'),
+                            const SizedBox(height: 8),
+                            _buildInfoRow(Icons.monitor_weight, 'Weight: ${_weight > 0 ? _weight.toString() : 'Loading...'} kg'),
+                            const SizedBox(height: 8),
+                            _buildInfoRow(Icons.bloodtype, 'Blood Group: ${_bloodGroup.isNotEmpty ? _bloodGroup : 'Loading...'}'),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -179,12 +190,12 @@ class _MyProfileState extends State<MyProfile> {
             Expanded(
               child: Text(
                 text,
-                style: const TextStyle(color: Colors.black87, fontSize: 18),
+                style: const TextStyle(color: Colors.black87, fontSize: 16), // Adjust font size
               ),
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 4), // Reduce spacing after info row
         Container(
           height: 1,
           color: Colors.grey[300],

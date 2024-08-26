@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'home.dart';
-import 'donation.dart';
-import 'request.dart';
 
 class BloodFactsPage extends StatelessWidget {
   const BloodFactsPage({super.key});
@@ -10,74 +7,28 @@ class BloodFactsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Blood Facts', style: TextStyle(
-          color: Colors.white,
-          fontSize: 28,
-          fontFamily: 'roboto',
-          fontWeight: FontWeight.w700,
-        )),
-        backgroundColor: Colors.red.shade900,
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.red.shade900,
-              ),
-              child: const Text(
-                'Menu',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text('Home'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HomePage()), // Navigate to HomePage
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.bloodtype),
-              title: const Text('Donate Blood'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Donate()), // Navigate to Donate page
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.request_page),
-              title: const Text('Request Blood'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const BloodRequestForm()), // Navigate to BloodRequestForm page
-                );
-              },
-            ),
-          ],
+        title: const Text(
+          'Blood Facts',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 28,
+            fontFamily: 'roboto',
+            fontWeight: FontWeight.w700,
+          ),
         ),
+        backgroundColor: Colors.red.shade900,
       ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              factWidget('assets/img.png', 'Your blood makes up about 8% of your body weight.', true),
-              factWidget('assets/img_5.png', 'The rarest blood type in the world is Rh-null, also known as "golden blood."', false),
-              factWidget('assets/img_2.png', 'The human body contains about 5 liters (8 pints) of blood.', true),
-              factWidget('assets/img_3.png', 'A single donation can save up to three lives.', false),
-              factWidget('assets/img_4.png', 'People with O-negative blood are universal donors.', true),
-              factWidget('assets/img_1.png', 'Blood is actually made up of four main components: red blood cells, white blood cells, plasma, and platelets.', false),
+              factWidget(1, 'Your blood makes up about 8% of your body weight.'),
+              factWidget(2, 'The rarest blood type in the world is Rh-null, also known as "golden blood."'),
+              factWidget(3, 'The human body contains about 5 liters (8 pints) of blood.'),
+              factWidget(4, 'A single donation can save up to three lives.'),
+              factWidget(5, 'People with O-negative blood are universal donors.'),
+              factWidget(6, 'Blood is made up of four main components: red blood cells, white blood cells, plasma, and platelets.'),
             ],
           ),
         ),
@@ -85,10 +36,10 @@ class BloodFactsPage extends StatelessWidget {
     );
   }
 
-  Widget factWidget(String imagePath, String fact, bool isImageLeft) {
+  Widget factWidget(int number, String fact) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey.shade300, // Light pink background color
+        color: Colors.grey.shade300,
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.5),
@@ -103,33 +54,35 @@ class BloodFactsPage extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          if (isImageLeft) ...[
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.red, width: 3), // Red border
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Image.asset(imagePath, width: 150, height: 150),
+          Container(
+            padding: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: Colors.red.shade900,
+              shape: BoxShape.circle,
             ),
-            const SizedBox(width: 15),
-          ],
+            child: Text(
+              '$number',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(width: 15),
           Expanded(
             child: Text(
               fact,
-              style: const TextStyle(fontSize: 17),
+              style: const TextStyle(
+                fontFamily: 'Lexend',
+                fontSize: 16,
+                color: Colors.black54,
+                fontWeight: FontWeight.w600,
+                height: 1.4, // Reduce the line height to decrease line spacing
+              ),
               textAlign: TextAlign.justify,
             ),
           ),
-          if (!isImageLeft) ...[
-            const SizedBox(width: 15),
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.red, width: 3), // Red border
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Image.asset(imagePath, width: 150, height: 150),
-            ),
-          ],
         ],
       ),
     );

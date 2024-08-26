@@ -85,14 +85,14 @@ class _SignInPageState extends State<SignInPage> {
           // Form content
           SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(30.0),
               child: Form(
                 key: _formKey,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    const SizedBox(height: 250), // Adjust this value to position the text fields higher
+                    const SizedBox(height: 350), // Adjust this value to position the text fields higher
                     // Email input field
                     TextFormField(
                       controller: _emailController,
